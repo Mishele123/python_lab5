@@ -15,7 +15,8 @@ import zipfile
 
 
 def get_list_dirs() -> None:
-    print(os.listdir("D:\python_labs\datas"))
+    train_dir = "train_dir"
+    print(os.listdir(train_dir))
 
 
 
