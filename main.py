@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import os
 import glob
 from PIL import Image
+import random
 
 
 class dataset(torch.utils.data.Dataset):
@@ -204,6 +205,56 @@ def main() -> None:
 
     draw_graph(train_losses, val_losses, 'Loss', 'Epochs', 'Loss Value')
     draw_graph(train_accuracies, val_accuracies, 'Accuracy', 'Epochs', 'Accuracy Value')
+
+    leopard_probs = []
+    model.eval()
+    with torch.no_grad():
+        for data, fileid in test_loader:
+            data = data.to(device)
+            preds = model(data)
+            preds_list = F.softmax(preds, dim=1)[:, 1].tolist()
+            leopard_probs += list(zip(list(fileid), preds_list))
+    leopard_probs.sort(key = lambda x : int(x[0]))
+
+
+    image_test_probs(leopard_probs)
+
+def image_test_probs(leopard_probs: []) -> None:
+    test_list = return_lists()[1]
+
+    idx = list(map(lambda x: x[0],leopard_probs))
+    prob = list(map(lambda x: x[1],leopard_probs))
+
+    submission = pd.DataFrame({'id':idx,'label':prob})
+    
+    test_list = return_lists()[1]
+
+    id_list = []
+    class_ = {0: 'tiger', 1: 'leopard'}
+
+    fig, axes = plt.subplots(2, 5, figsize=(20, 12), facecolor='w')
+
+    for ax in axes.ravel():
+        i = random.choice(submission.index.values)
+        print(f"Selected index: {i}")
+
+        label = submission.loc[submission.index == i, 'label'].values[0]
+        
+        print(f"Label = {label}")
+  
+        if label > 0.5:
+            label = 1
+        else:
+            label = 0
+            
+        img_path = os.path.join(test_list[i])
+        print(f"Image path: {img_path}")
+        
+        img = Image.open(img_path)
+        ax.set_title(class_[label])
+        ax.imshow(img)
+
+    plt.show()
 
 def draw_graph(train_values : [], val_values : [], title : str, xlabel : str, ylabel : str) -> None:
     "Draw graphics "
