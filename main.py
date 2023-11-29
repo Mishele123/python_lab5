@@ -152,6 +152,9 @@ def main() -> None:
     optimizer = optim.Adam(params = model.parameters(),lr=lr)
     criterion = nn.CrossEntropyLoss()
 
+    train_losses, train_accuracies = [], []
+    val_losses, val_accuracies = [], []
+
     for epoch in range(epochs):
         epoch_loss = 0
         epoch_accuracy = 0
@@ -170,6 +173,10 @@ def main() -> None:
             acc = ((output.argmax(dim=1) == label).float().mean())
             epoch_accuracy += acc/len(train_loader)
             epoch_loss += loss/len(train_loader)
+
+            train_accuracies.append(epoch_accuracy)
+            train_losses.append(epoch_loss)
+
             
         print('Epoch : {}, train accuracy : {}, train loss : {}'.format(epoch+1, epoch_accuracy,epoch_loss))
         
@@ -188,10 +195,28 @@ def main() -> None:
                 acc = ((val_output.argmax(dim=1) == label).float().mean())
                 epoch_val_accuracy += acc/ len(validate_loader)
                 epoch_val_loss += val_loss/ len(validate_loader)
-                
+            
+            val_accuracies.append(epoch_val_accuracy)
+            val_losses.append(epoch_val_loss)
+
             print('Epoch : {}, val_accuracy : {}, val_loss : {}'.format(epoch+1, epoch_val_accuracy,epoch_val_loss))
+    
 
+    draw_graph(train_losses, val_losses, 'Loss', 'Epochs', 'Loss Value')
+    draw_graph(train_accuracies, val_accuracies, 'Accuracy', 'Epochs', 'Accuracy Value')
 
+def draw_graph(train_values : [], val_values : [], title : str, xlabel : str, ylabel : str) -> None:
+    "Draw graphics "
+    train_values = [val.detach().numpy() for val in train_values]
+    val_values = [val.detach().numpy() for val in val_values]
+
+    plt.plot(train_values, label='Train')
+    plt.plot(val_values, label='Validation')
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.legend()
+    plt.show()
 
 if __name__ == "__main__":
     main()
