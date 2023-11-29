@@ -312,4 +312,5 @@ def draw_graph(train_values : [], val_values : [], title : str, xlabel : str, yl
 
 
 if __name__ == "__main__":
+    main()
     image_recognition()
