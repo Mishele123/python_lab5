@@ -1,1 +1,3 @@
 train_dir/**
+test_dir/**
+validate_dir/**
