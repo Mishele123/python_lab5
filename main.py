@@ -38,6 +38,7 @@ class dataset(torch.utils.data.Dataset):
             
         return img_transformed,label
 
+
 class Cnn(nn.Module):
     def __init__(self):
         super(Cnn,self).__init__()
@@ -78,6 +79,7 @@ class Cnn(nn.Module):
         out = self.relu(self.fc1(out))
         out = self.fc2(out)
         return out
+
 
 def data_loader(batch_size: int) -> torch.utils.data.DataLoader:
 
@@ -130,7 +132,7 @@ def return_lists() -> list:
     "the function returns an array containing path to the images (split datas)"
     from sklearn.model_selection import train_test_split
 
-    train_dir = "train_dir"
+    train_dir = "train_dir" # path to dir with images
 
     train_list = glob.glob(os.path.join(train_dir,'*.jpg'))
     train_list, temp_list = train_test_split(train_list, test_size=0.2)
@@ -220,6 +222,7 @@ def main() -> None:
 
     torch.save(model.state_dict(), 'trained_model.pth')
 
+
 def image_test_probs(leopard_probs: []) -> None:
     test_list = return_lists()[1]
 
@@ -257,6 +260,43 @@ def image_test_probs(leopard_probs: []) -> None:
 
     plt.show()
 
+
+def image_recognition() -> None:
+    "Test model"
+    model = Cnn().to('cpu')
+
+    model.load_state_dict(torch.load('trained_model.pth'))
+    model.eval()
+
+    image_path = "D:\\python_labs\\datas\\leopard\\leopard_1039.jpg"
+
+
+    # Определение преобразований для входного изображения
+    transform = transforms.Compose([
+        transforms.Resize((240, 240)),
+        transforms.RandomResizedCrop(240),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+    ])
+
+
+    image = Image.open(image_path)
+    tensor_image = transform(image).unsqueeze(0)
+
+
+    with torch.no_grad():
+        output = model(tensor_image)
+
+    probabilities = F.softmax(output, dim=1)
+
+    print("Предсказанные вероятности:", probabilities)
+    predicted_class = torch.argmax(probabilities).item()
+    if predicted_class == 1:
+        print("Предсказанный класс: leopard")
+    else:
+        print("Предсказанный класс: tiger")
+
+
 def draw_graph(train_values : [], val_values : [], title : str, xlabel : str, ylabel : str) -> None:
     "Draw graphics "
     train_values = [val.detach().numpy() for val in train_values]
@@ -270,5 +310,6 @@ def draw_graph(train_values : [], val_values : [], title : str, xlabel : str, yl
     plt.legend()
     plt.show()
 
+
 if __name__ == "__main__":
-    main()
+    image_recognition()
