@@ -20,17 +20,17 @@ import random
 
 
 def return_lists() -> list:
-    "the function returns an array containing the names of the images"
+    
+    "the function returns an array containing path to the images (split datas)"
+    from sklearn.model_selection import train_test_split
+
     train_dir = "train_dir"
-    test_dir = "test_dir"
-    validate_dir = "validate_dir"
 
     train_list = glob.glob(os.path.join(train_dir,'*.jpg'))
-    test_list = glob.glob(os.path.join(test_dir,'*.jpg'))
-    validate_list = glob.glob(os.path.join(validate_dir,'*.jpg'))
-    
+    train_list, temp_list = train_test_split(train_list, test_size=0.2)
+    test_list, validate_list = train_test_split(temp_list, test_size=0.5)
 
-    print(train_list[0].split("\\")[1].split("_")[0])
+    # print(train_list[0].split("\\")[1].split("_")[0])
 
     return train_list, test_list, validate_list
 
