@@ -100,23 +100,23 @@ def data_loader(batch_size: int) -> torch.utils.data.DataLoader:
 def data_augmentation() -> transforms.transforms.Compose:
     "Changes image parameters"
     train_transforms =  transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.RandomResizedCrop(224),
+        transforms.Resize((240, 240)),
+        transforms.RandomResizedCrop(240),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
     ])
 
     validate_transforms = transforms.Compose([
-            transforms.Resize((224, 224)),
-            transforms.RandomResizedCrop(224),
+            transforms.Resize((240, 240)),
+            transforms.RandomResizedCrop(240),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
         ])
 
 
     test_transforms = transforms.Compose([   
-        transforms.Resize((224, 224)),
-        transforms.RandomResizedCrop(224),
+        transforms.Resize((240, 240)),
+        transforms.RandomResizedCrop(240),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor()
         ])
@@ -216,8 +216,9 @@ def main() -> None:
             leopard_probs += list(zip(list(fileid), preds_list))
     leopard_probs.sort(key = lambda x : int(x[0]))
 
-
     image_test_probs(leopard_probs)
+
+    torch.save(model.state_dict(), 'trained_model.pth')
 
 def image_test_probs(leopard_probs: []) -> None:
     test_list = return_lists()[1]
