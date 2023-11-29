@@ -152,6 +152,45 @@ def main() -> None:
     optimizer = optim.Adam(params = model.parameters(),lr=lr)
     criterion = nn.CrossEntropyLoss()
 
+    for epoch in range(epochs):
+        epoch_loss = 0
+        epoch_accuracy = 0
+        
+        for data, label in train_loader:
+            data = data.to(device)
+            label = label.to(device)
+            
+            output = model(data)
+            loss = criterion(output, label)
+            
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            
+            acc = ((output.argmax(dim=1) == label).float().mean())
+            epoch_accuracy += acc/len(train_loader)
+            epoch_loss += loss/len(train_loader)
+            
+        print('Epoch : {}, train accuracy : {}, train loss : {}'.format(epoch+1, epoch_accuracy,epoch_loss))
+        
+        
+        with torch.no_grad():
+            epoch_val_accuracy=0
+            epoch_val_loss =0
+            for data, label in validate_loader:
+                data = data.to(device)
+                label = label.to(device)
+                
+                val_output = model(data)
+                val_loss = criterion(val_output,label)
+                
+                
+                acc = ((val_output.argmax(dim=1) == label).float().mean())
+                epoch_val_accuracy += acc/ len(validate_loader)
+                epoch_val_loss += val_loss/ len(validate_loader)
+                
+            print('Epoch : {}, val_accuracy : {}, val_loss : {}'.format(epoch+1, epoch_val_accuracy,epoch_val_loss))
+
 
 
 if __name__ == "__main__":
