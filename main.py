@@ -17,6 +17,31 @@ from PIL import Image
 import random
 
 
+def data_augmentation() -> transforms.transforms.Compose:
+    train_transforms =  transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.RandomResizedCrop(224),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+    ])
+
+    validate_transforms = transforms.Compose([
+            transforms.Resize((224, 224)),
+            transforms.RandomResizedCrop(224),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+        ])
+
+
+    test_transforms = transforms.Compose([   
+        transforms.Resize((224, 224)),
+        transforms.RandomResizedCrop(224),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor()
+        ])
+    
+    
+    return train_transforms, validate_transforms, test_transforms
 
 
 def return_lists() -> list:
@@ -36,7 +61,7 @@ def return_lists() -> list:
 
 
 def main() -> None:
-    return_lists()
+    data_augmentation()
 
 if __name__ == "__main__":
     main()
